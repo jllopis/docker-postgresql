@@ -20,8 +20,11 @@ RUN apt-get -yq install postgresql-9.3 postgresql-client-9.3 postgresql-contrib-
 USER postgres
 
 # Initialize the server
-RUN /etc/init.d/postgresql start &&\
-    psql --command "ALTER USER postgres ENCRYPTED PASSWORD 'secret';"
+RUN /usr/bin/pg_dropcluster 9.3 main &&\
+    /usr/bin/pg_createcluster --locale es_ES.UTF-8 9.3 main &&\
+    /etc/init.d/postgresql start &&\
+    psql --command "ALTER USER postgres ENCRYPTED PASSWORD 'secret';" &&\
+    /etc/init.d/postgresql stop
 
 RUN echo "host all  all    0.0.0.0/0  md5" >> /etc/postgresql/9.3/main/pg_hba.conf
 RUN echo "listen_addresses='*'" >> /etc/postgresql/9.3/main/postgresql.conf
